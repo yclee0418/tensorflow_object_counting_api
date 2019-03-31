@@ -1,5 +1,6 @@
 import glob, os
 import tensorflow as tf
+import urllib
 from utils import label_map_util
 
 def set_model(model_name):
