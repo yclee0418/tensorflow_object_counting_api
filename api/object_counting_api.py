@@ -350,7 +350,7 @@ def targeted_object_counting(input_video, detection_graph, category_index, is_co
                 writer.writerows([csv_line.split(',')])
 
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        output_movie = cv2.VideoWriter('the_output.avi', fourcc, fps, (width, height))
+        output_movie = cv2.VideoWriter('the_output_{}.avi'.format(targeted_object), fourcc, fps, (width, height))
         # input video
         cap = cv2.VideoCapture(input_video)
 
@@ -378,14 +378,17 @@ def targeted_object_counting(input_video, detection_graph, category_index, is_co
             num_detections = detection_graph.get_tensor_by_name('num_detections:0')
 
             # for all the frames that are extracted from input video
+            frame_cnt = 0
             while(cap.isOpened()):
                 ret, frame = cap.read()                
 
                 if not  ret:
                     print("end of the video file...")
                     break
-                
+                frame_cnt += 1
                 input_frame = frame
+                dim = (frame.shape[1], frame.shape[0])
+                orig_frame = cv2.resize(frame, dim, interpolation = cv2.INTER_LINEAR)
 
                 # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
                 image_np_expanded = np.expand_dims(input_frame, axis=0)
@@ -413,12 +416,14 @@ def targeted_object_counting(input_video, detection_graph, category_index, is_co
                 if(len(the_result) == 0):
                     cv2.putText(input_frame, "...", (10, 35), font, 0.8, (0,255,255),2,cv2.FONT_HERSHEY_SIMPLEX)                       
                 else:
+                    # cv2.imshow('target object detected', input_frame)
+                    cv2.imwrite('./output/{}_{}.jpg'.format(targeted_object, frame_cnt), orig_frame)
                     cv2.putText(input_frame, the_result, (10, 35), font, 0.8, (0,255,255),2,cv2.FONT_HERSHEY_SIMPLEX)
                 
                 #cv2.imshow('object counting',input_frame)
 
                 output_movie.write(input_frame)
-                print ("writing frame")
+                print ("writing frame", str(frame_cnt))
 
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                         break

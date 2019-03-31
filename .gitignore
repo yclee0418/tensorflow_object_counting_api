@@ -102,3 +102,5 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+input_images_and_videos/first_phase_p.mp4
+input_images_and_videos/out_part_1.mp4
